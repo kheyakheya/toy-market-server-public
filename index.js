@@ -29,10 +29,26 @@ async function run() {
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    // get all toy
+    app.get('/allToys', async(req,res)=>{
+      const result= await toyCollection.find().limit(20).toArray();
+      res.send(result);
+
+    })
+    // get all toy by category
+    app.get("/allToys/:category", async (req, res) => {
+      console.log(req.params.category);
+      
+      const result = await toyCollection
+        .find({
+          category: req.params.category,
+        })
+        .toArray();
+      res.send(result);
+    });
     // post toys
     app.post('/allToys', async (req,res)=>{
       const toy= req.body;
-      console.log("toypost",toy)
       const result= await toyCollection.insertOne(toy);
       res.send(result)
     })
