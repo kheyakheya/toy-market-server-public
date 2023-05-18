@@ -1,7 +1,7 @@
 const express = require ('express') ;
 const cors= require('cors');
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 
 const app= express();
@@ -26,6 +26,10 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     const toyCollection=client.db('toyDb').collection('toys');
+    // index of search 
+    const indexKeys = { toyName: 1 }; // Replace field1 and field2 with your actual field names
+    const indexOptions = { name: "toyName" }; // Replace index_name with the desired index name
+    const result = await toyCollection.createIndex(indexKeys, indexOptions);
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
@@ -37,7 +41,6 @@ async function run() {
     })
     // get all toy by category
     app.get("/allToys/:category", async (req, res) => {
-      console.log(req.params.category);
       
       const result = await toyCollection
         .find({
@@ -46,6 +49,24 @@ async function run() {
         .toArray();
       res.send(result);
     });
+    // get single toy
+    app.get('/toy/:id', async(req,res)=>{
+      const id= req.params.id;
+      const query= {_id: new ObjectId(id)};
+      const result = await toyCollection.findOne(query);
+      res.send(result);
+    })
+    // get toys by search
+    app.get('/search/:text', async(req,res)=>{
+      const search= req.params.text;
+      const result= await toyCollection.find({
+        $or: [
+          { title: { $regex: search, $options: "i" } },
+          { category: { $regex: search, $options: "i" } },
+        ],
+      }).toArray();
+      res.send(result)
+    })
     // post toys
     app.post('/allToys', async (req,res)=>{
       const toy= req.body;
