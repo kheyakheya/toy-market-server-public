@@ -67,11 +67,36 @@ async function run() {
       }).toArray();
       res.send(result)
     })
+    // get toys by email
+    app.get('/myToys/:email', async(req,res)=>{
+      const text= req.params.email;
+      const query= {email: text };
+      const result= await toyCollection.find(query).toArray();
+      res.send(result);
+    })
     // post toys
     app.post('/allToys', async (req,res)=>{
       const toy= req.body;
       const result= await toyCollection.insertOne(toy);
       res.send(result)
+    })
+    // update a toy
+    app.put('/update/:id', async(req,res)=>{
+      const id=req.params.id;
+      console.log(id);
+      const updatedToy= req.body;
+      const filter= {_id: new ObjectId(id)};
+      const updateDoc={
+        $set:{
+          price: updatedToy.price,
+          quantity: updatedToy.quantity,
+          description: updatedToy.description
+
+        }
+      }
+      const result= await toyCollection.updateOne(filter,updateDoc);
+      res.send(result);
+
     })
 
 
