@@ -83,7 +83,6 @@ async function run() {
     // update a toy
     app.put('/update/:id', async(req,res)=>{
       const id=req.params.id;
-      console.log(id);
       const updatedToy= req.body;
       const filter= {_id: new ObjectId(id)};
       const updateDoc={
@@ -97,6 +96,14 @@ async function run() {
       const result= await toyCollection.updateOne(filter,updateDoc);
       res.send(result);
 
+    })
+    // delete a toy
+    app.delete('/toy/:id', async (req,res)=>{
+      const id= req.params.id;
+      console.log(id);
+      const query= {_id: new ObjectId(id)};
+      const result= await toyCollection.deleteOne(query);
+      res.send(result) ;
     })
 
 
