@@ -24,7 +24,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
     const toyCollection=client.db('toyDb').collection('toys');
     // index of search 
     const indexKeys = { toyName: 1 }; // Replace field1 and field2 with your actual field names
@@ -35,7 +35,8 @@ async function run() {
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
     // get all toy
     app.get('/allToys', async(req,res)=>{
-      const result= await toyCollection.find().limit(20).toArray();
+      const quant= 20;
+      const result= await toyCollection.find().limit(quant).toArray();
       res.send(result);
 
     })
@@ -74,11 +75,18 @@ async function run() {
       const result= await toyCollection.find(query).toArray();
       res.send(result);
     })
-    // sort 
+    // sort high to low
     app.get('/highSort/:email', async(req,res)=>{
       const text= req.params.email;
       const query= {email: text };
       const result= await toyCollection.find(query).sort({price: -1}).toArray();
+      res.send(result);
+    })
+    // sort low to high
+    app.get('/lowSort/:email', async(req,res)=>{
+      const text= req.params.email;
+      const query= {email: text };
+      const result= await toyCollection.find(query).sort({price: 1}).toArray();
       res.send(result);
     })
     // post toys
