@@ -63,7 +63,6 @@ async function run() {
       const result= await toyCollection.find({
         $or: [
           { title: { $regex: search, $options: "i" } },
-          { category: { $regex: search, $options: "i" } },
         ],
       }).toArray();
       res.send(result)
